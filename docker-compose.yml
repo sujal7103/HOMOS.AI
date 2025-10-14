@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_DB: homosDB
+      POSTGRES_USER: homos.ai
+      POSTGRES_PASSWORD: homos.ai
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+      # make sure you don't have another container running on 5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"

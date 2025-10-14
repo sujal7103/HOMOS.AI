@@ -1,0 +1,16 @@
+# This is a config for E2B sandbox template.
+# You can use template ID or template name to create a sandbox:
+
+# Python SDK
+# from e2b import Sandbox, AsyncSandbox
+# sandbox = Sandbox("homos-ai-nextjs-sujal") # Sync sandbox
+# sandbox = await AsyncSandbox.create("homos-ai-nextjs-sujal") # Async sandbox
+
+# JS SDK
+# import { Sandbox } from 'e2b'
+# const sandbox = await Sandbox.create('homos-ai-nextjs-sujal')
+
+template_name = "homos-ai-nextjs-sujal"
+template_id = "homos-ai-nextjs-sujal"
+start_cmd = "/compile_page.sh"
+dockerfile = "e2b.Dockerfile"
