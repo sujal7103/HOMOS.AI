@@ -34,7 +34,7 @@ export default function RootLayout({
     }}>
       <TRPCReactProvider>
         <head>
-          <link rel="icon" href="/logo.svg" />
+          <link rel="icon" href="/logo.png" />
         </head>
         <html lang="en" suppressHydrationWarning>
           <body

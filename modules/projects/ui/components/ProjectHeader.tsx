@@ -42,7 +42,7 @@ const ProjectHeader = ({ projectId }: Props) => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="focus-visible:ring-0 hover:bg-transparent hover:opacity-75 transition-opacity pl-2!">
-            <Image src="/logo.svg" alt="Homos.ai Logo" width={20} height={20} />
+            <Image src="/logo.png" alt="Homos.ai Logo" width={20} height={20} />
             <span className="text-sm font-medium">{project.name}</span>
             <ChevronDownIcon />
           </Button>

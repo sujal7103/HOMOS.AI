@@ -37,24 +37,24 @@ const ProjectList = () => {
 				)}
 				{!isLoading &&
 					projects?.map((project) => (
-						<Button
-							key={project.id}
-							variant="outline"
-							className="font-normal h-auto justify-start w-full text-start p-4"
-							asChild
-						>
-							<Link href={`/projects/${project.id}`}>
-								<div className="flex items-center gap-x-4">
-									<Image
-										src="/logo.svg"
-										alt="Homos.ai Logo"
-										width={32}
-										height={32}
-										className="object-contain"
-									/>
-									<div className="flex flex-col">
-										<h3 className="truncate font-medium">{project.name}</h3>
-										<p className="text-sm text-muted-foreground">
+					<Button
+						key={project.id}
+						variant="outline"
+						className="font-normal h-auto justify-start w-full text-start p-4"
+						asChild
+					>
+						<Link href={`/projects/${project.id}`}>
+							<div className="flex items-center gap-x-4">
+								<Image
+									src="/logo.png"
+									alt="Homos.ai Logo"
+									width={32}
+									height={32}
+									className="object-contain"
+								/>
+								<div className="flex flex-col">
+									<h3 className="truncate font-medium">{project.name}</h3>
+									<p className="text-sm text-muted-foreground">
 											{formatDistanceToNow(project.updatedAt, {
 												addSuffix: true,
 											})}

@@ -35,15 +35,15 @@ const Navbar = () => {
 					: "bg-transparent border-transparent"
 			)}
 		>
-			<div className="max-w-5xl mx-auto w-full flex justify-between items-center">
-				<Link href="/" className="flex items-center gap-2">
-					<Image src="/logo.svg" alt="Homos.ai Logo" width={24} height={24} />
-					<span className="font-semibold text-lg">Homos.ai</span>
-				</Link>
-				<SignedOut>
-					<div className="flex gap-2">
-						<SignInButton>
-							<Button variant="outline" size="sm">
+		<div className="max-w-5xl mx-auto w-full flex justify-between items-center">
+			<Link href="/" className="flex items-center gap-2">
+				<Image src="/logo.png" alt="Homos.ai Logo" width={24} height={24} />
+				<span className="font-semibold text-lg">Homos.ai</span>
+			</Link>
+			<SignedOut>
+				<div className="flex gap-2">
+					<SignInButton>
+						<Button variant="outline" size="sm">
 								Sign In
 							</Button>
 						</SignInButton>

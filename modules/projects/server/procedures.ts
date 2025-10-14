@@ -48,12 +48,15 @@ export const projectRouter = createTRPCRouter({
 			try {
 				await consumeCredits();
 			} catch (error) {
+				// Rate limiter throws an object with remainingPoints property when limit exceeded
 				if (error instanceof Error) {
+					// Regular errors (like auth errors) should be thrown as BAD_REQUEST
 					throw new TRPCError({
 						code: "BAD_REQUEST",
-						message: "Something went error",
+						message: error.message || "Something went wrong",
 					});
 				} else {
+					// Rate limit exceeded
 					throw new TRPCError({
 						code: "TOO_MANY_REQUESTS",
 						message: "You have run out of credits",

@@ -55,7 +55,7 @@ const AssistantMessage = ({
 		>
 			<div className="flex items-center gap-2 pl-2 mb-2">
 				<Image
-					src="/logo.svg"
+					src="/logo.png"
 					alt="Homos.ai Logo"
 					width={20}
 					height={20}

@@ -12,7 +12,7 @@ const PricingPage = () => {
       <section className="space-y-6 pt-[16vh] 2xl:pt-48">
         <div className="flex flex-col items-center">
           <Image
-            src="/logo.svg"
+            src="/logo.png"
             alt="Homos.ai Logo"
             width={50}
             height={50}

@@ -34,4 +34,4 @@ Successfully renamed all instances of "VibeCraft" to "Homos.ai" throughout the p
 1. The project is now fully rebranded to Homos.ai
 2. All user-facing text has been updated
 3. All configuration and code references have been updated
-4. Consider updating the logo file if needed (/public/logo.svg)
+4. Logo file has been updated to use logo.png (/public/logo.png)
