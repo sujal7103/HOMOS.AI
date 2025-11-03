@@ -47,60 +47,86 @@ export const codeAgent = inngest.createFunction(
 
 			// Initialize Next.js environment in the sandbox
 			await step.run("initialize-nextjs", async () => {
-				const sandbox = await getSandbox(sandboxId);
-				
-				console.log("Initializing Next.js environment in sandbox...");
-				
-				// Check if package.json exists in /home/user
-				const checkPackageJson = await sandbox.commands.run("test -f /home/user/package.json && echo 'exists' || echo 'missing'", { 
-					onStdout: () => {},
-					onStderr: () => {},
-				});
-				
-				if (checkPackageJson.stdout.trim() === 'missing') {
-					console.log("Next.js not found, creating new Next.js app in /home/user...");
+				try {
+					const sandbox = await getSandbox(sandboxId);
 					
-					// Create Next.js app directly in /home/user (using . as target)
-					const createApp = await sandbox.commands.run(
-						"cd /home/user && npx create-next-app@15.3.5 . --yes --no-git --typescript --tailwind --app --turbopack --import-alias '@/*'",
-						{
-							onStdout: (data: string) => console.log(data),
-							onStderr: (data: string) => console.error(data),
-						}
-					);
+					console.log("Initializing Next.js environment in sandbox...");
 					
-					if (createApp.exitCode !== 0) {
-						throw new Error(`Failed to create Next.js app: ${createApp.stderr}`);
+					// Check if package.json exists in /home/user
+					let checkPackageJson;
+					try {
+						checkPackageJson = await sandbox.commands.run("test -f /home/user/package.json && echo 'exists' || echo 'missing'", { 
+							onStdout: () => {},
+							onStderr: () => {},
+						});
+					} catch (e) {
+						console.error("Error checking package.json:", e);
+						throw new Error(`Failed to check for existing Next.js installation: ${e instanceof Error ? e.message : String(e)}`);
 					}
 					
-					// Install shadcn-ui dependencies
-					console.log("Installing shadcn-ui...");
-					const installShadcn = await sandbox.commands.run(
-						"cd /home/user && npx shadcn@2.8.0 init --yes --defaults",
-						{
-							onStdout: (data: string) => console.log(data),
-							onStderr: (data: string) => console.error(data),
+					if (checkPackageJson.stdout.trim() === 'missing') {
+						console.log("Next.js not found, creating new Next.js app in /home/user...");
+						
+						// Create Next.js app directly in /home/user (using . as target)
+						let createApp;
+						try {
+							createApp = await sandbox.commands.run(
+								"cd /home/user && npx create-next-app@15.3.5 . --yes --no-git --typescript --tailwind --app --turbopack --import-alias '@/*'",
+								{
+									onStdout: (data: string) => console.log(data),
+									onStderr: (data: string) => console.error(data),
+								}
+							);
+						} catch (e) {
+							console.error("Error creating Next.js app:", e);
+							throw new Error(`Failed to create Next.js app: ${e instanceof Error ? e.message : String(e)}`);
 						}
-					);
-					
-					if (installShadcn.exitCode !== 0) {
-						console.warn("Shadcn init warning (non-critical):", installShadcn.stderr);
+						
+						if (createApp.exitCode !== 0) {
+							throw new Error(`Failed to create Next.js app (exit code ${createApp.exitCode}): ${createApp.stderr}`);
+						}
+						
+						// Install shadcn-ui dependencies
+						console.log("Installing shadcn-ui...");
+						try {
+							const installShadcn = await sandbox.commands.run(
+								"cd /home/user && npx shadcn@2.8.0 init --yes --defaults",
+								{
+									onStdout: (data: string) => console.log(data),
+									onStderr: (data: string) => console.error(data),
+								}
+							);
+							
+							if (installShadcn.exitCode !== 0) {
+								console.warn("Shadcn init warning (non-critical):", installShadcn.stderr);
+							}
+						} catch (e) {
+							console.warn("Shadcn installation failed (non-critical):", e);
+						}
+						
+						// Start the dev server in background
+						console.log("Starting Next.js dev server...");
+						try {
+							sandbox.commands.run("cd /home/user && npm run dev", {
+								onStdout: (data: string) => console.log("[Next.js]", data),
+								onStderr: (data: string) => console.error("[Next.js]", data),
+								background: true,
+							});
+							
+							// Wait for server to be ready
+							await new Promise(resolve => setTimeout(resolve, 10000));
+							
+							console.log("Next.js environment initialized successfully");
+						} catch (e) {
+							console.error("Error starting Next.js dev server:", e);
+							throw new Error(`Failed to start Next.js dev server: ${e instanceof Error ? e.message : String(e)}`);
+						}
+					} else {
+						console.log("Next.js already installed in /home/user, skipping initialization");
 					}
-					
-					// Start the dev server in background
-					console.log("Starting Next.js dev server...");
-					sandbox.commands.run("cd /home/user && npm run dev", {
-						onStdout: (data: string) => console.log("[Next.js]", data),
-						onStderr: (data: string) => console.error("[Next.js]", data),
-						background: true,
-					});
-					
-					// Wait for server to be ready
-					await new Promise(resolve => setTimeout(resolve, 10000));
-					
-					console.log("Next.js environment initialized successfully");
-				} else {
-					console.log("Next.js already installed in /home/user, skipping initialization");
+				} catch (error) {
+					console.error("Error in initialize-nextjs step:", error);
+					throw error;
 				}
 			});
 
