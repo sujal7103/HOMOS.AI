@@ -48,6 +48,9 @@ next-env.d.ts
 # Local database files
 /data/
 
+# E2B template directory
+/e2b-template/
+
 # Package lock files (optional - uncomment to ignore)
 package-lock.json
 # yarn.lock
