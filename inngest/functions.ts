@@ -93,18 +93,15 @@ export const codeAgent = inngest.createFunction(
 				}
 			);
 
-			// Check if OpenAI API key is set
-			if (!process.env.OPENAI_API_KEY) {
-				throw new Error("OPENAI_API_KEY is not set in environment variables. Please add it to your .env file.");
-			}
+		// Check if OpenAI API key is set
+		if (!process.env.OPENAI_API_KEY) {
+			throw new Error("OPENAI_API_KEY is not set in environment variables. Please add it to your .env file.");
+		}
 
-			const model = openai({
-				model: "gpt-4.1",
-				baseUrl: "https://models.github.ai/inference",
-				apiKey: process.env.OPENAI_API_KEY!,
-			});
-
-			const codeAgent = createAgent<AgentState>({
+		const model = openai({
+			model: "gpt-4o-mini",
+			apiKey: process.env.OPENAI_API_KEY!,
+		});			const codeAgent = createAgent<AgentState>({
 				name: "code-agent",
 				system: PROMPT,
 				model,
@@ -231,8 +228,7 @@ export const codeAgent = inngest.createFunction(
 				name: "fragment-title",
 				system: FRAGMENT_TITLE_PROMPT,
 				model: openai({
-					model: "gpt-4o",
-					baseUrl: "https://models.github.ai/inference",
+					model: "gpt-4o-mini",
 					apiKey: process.env.OPENAI_API_KEY!,
 				}),
 			});
@@ -241,8 +237,7 @@ export const codeAgent = inngest.createFunction(
 				name: "response-generator",
 				system: RESPONSE_PROMPT,
 				model: openai({
-					model: "gpt-4o",
-					baseUrl: "https://models.github.ai/inference",
+					model: "gpt-4o-mini",
 					apiKey: process.env.OPENAI_API_KEY!,
 				}),
 			});
