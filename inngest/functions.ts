@@ -45,89 +45,18 @@ export const codeAgent = inngest.createFunction(
 				}
 			});
 
-			// Initialize Next.js environment in the sandbox
-			await step.run("initialize-nextjs", async () => {
-				try {
-					const sandbox = await getSandbox(sandboxId);
-					
-					console.log("Initializing Next.js environment in sandbox...");
-					
-					// Check if package.json exists in /home/user
-					let checkPackageJson;
-					try {
-						checkPackageJson = await sandbox.commands.run("test -f /home/user/package.json && echo 'exists' || echo 'missing'", { 
-							onStdout: () => {},
-							onStderr: () => {},
-						});
-					} catch (e) {
-						console.error("Error checking package.json:", e);
-						throw new Error(`Failed to check for existing Next.js installation: ${e instanceof Error ? e.message : String(e)}`);
-					}
-					
-					if (checkPackageJson.stdout.trim() === 'missing') {
-						console.log("Next.js not found, creating new Next.js app in /home/user...");
-						
-						// Create Next.js app directly in /home/user (using . as target)
-						let createApp;
-						try {
-							createApp = await sandbox.commands.run(
-								"cd /home/user && npx create-next-app@15.3.5 . --yes --no-git --typescript --tailwind --app --turbopack --import-alias '@/*'",
-								{
-									onStdout: (data: string) => console.log(data),
-									onStderr: (data: string) => console.error(data),
-								}
-							);
-						} catch (e) {
-							console.error("Error creating Next.js app:", e);
-							throw new Error(`Failed to create Next.js app: ${e instanceof Error ? e.message : String(e)}`);
-						}
-						
-						if (createApp.exitCode !== 0) {
-							throw new Error(`Failed to create Next.js app (exit code ${createApp.exitCode}): ${createApp.stderr}`);
-						}
-						
-						// Install shadcn-ui dependencies
-						console.log("Installing shadcn-ui...");
-						try {
-							const installShadcn = await sandbox.commands.run(
-								"cd /home/user && npx shadcn@2.8.0 init --yes --defaults",
-								{
-									onStdout: (data: string) => console.log(data),
-									onStderr: (data: string) => console.error(data),
-								}
-							);
-							
-							if (installShadcn.exitCode !== 0) {
-								console.warn("Shadcn init warning (non-critical):", installShadcn.stderr);
-							}
-						} catch (e) {
-							console.warn("Shadcn installation failed (non-critical):", e);
-						}
-						
-						// Start the dev server in background
-						console.log("Starting Next.js dev server...");
-						try {
-							sandbox.commands.run("cd /home/user && npm run dev", {
-								onStdout: (data: string) => console.log("[Next.js]", data),
-								onStderr: (data: string) => console.error("[Next.js]", data),
-								background: true,
-							});
-							
-							// Wait for server to be ready
-							await new Promise(resolve => setTimeout(resolve, 10000));
-							
-							console.log("Next.js environment initialized successfully");
-						} catch (e) {
-							console.error("Error starting Next.js dev server:", e);
-							throw new Error(`Failed to start Next.js dev server: ${e instanceof Error ? e.message : String(e)}`);
-						}
-					} else {
-						console.log("Next.js already installed in /home/user, skipping initialization");
-					}
-				} catch (error) {
-					console.error("Error in initialize-nextjs step:", error);
-					throw error;
-				}
+			// Setup basic working directory
+			await step.run("setup-workspace", async () => {
+				const sandbox = await getSandbox(sandboxId);
+				console.log("Setting up workspace...");
+				
+				// Create a working directory
+				await sandbox.commands.run("mkdir -p /home/user/project", {
+					onStdout: () => {},
+					onStderr: () => {},
+				});
+				
+				console.log("Workspace ready");
 			});
 
 			const perviousMessages = await step.run(
@@ -328,8 +257,8 @@ export const codeAgent = inngest.createFunction(
 			if (!isError) {
 				sandboxUrl = await step.run("get-sandbox-url", async () => {
 					const sandbox = await getSandbox(sandboxId!);
-					const host = sandbox.getHost(3000);
-					return `https://${host}`;
+					// Return sandbox info URL instead of trying to connect to a dev server
+					return `https://e2b.dev/sandbox/${sandboxId}`;
 				});
 			}
 
@@ -371,26 +300,38 @@ export const codeAgent = inngest.createFunction(
 		} catch (error) {
 			console.error("Agent execution error:", error);
 			
-			// Extract detailed error information
+			// Extract detailed error information with better serialization
 			let errorMessage = "Unknown error";
 			let errorDetails = "";
 			
 			if (error instanceof Error) {
 				errorMessage = error.message;
 				errorDetails = error.stack || "";
+				console.error("Error type: Error");
+				console.error("Error name:", error.name);
+				console.error("Error message:", error.message);
+				console.error("Error stack:", error.stack);
 			} else if (typeof error === "string") {
 				errorMessage = error;
+				console.error("Error type: string");
+			} else if (error && typeof error === "object") {
+				errorMessage = JSON.stringify(error, Object.getOwnPropertyNames(error));
+				console.error("Error type: object");
+				console.error("Error object:", errorMessage);
 			} else {
-				errorMessage = JSON.stringify(error);
+				errorMessage = String(error);
+				console.error("Error type:", typeof error);
+				console.error("Error value:", errorMessage);
 			}
 			
-			console.error("Error details:", errorDetails);
+			console.error("Final error message:", errorMessage);
+			console.error("Final error details:", errorDetails);
 
 			await step.run("save-error", async () => {
 				return await prisma.message.create({
 					data: {
 						projectId: event.data.projectId,
-						content: `Agent failed: ${errorMessage}`,
+						content: `Agent failed: ${errorMessage}${errorDetails ? `\n\nStack trace:\n${errorDetails}` : ""}`,
 						role: "ASSISTANT",
 						type: "ERROR",
 					},
