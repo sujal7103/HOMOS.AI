@@ -1,11 +1,10 @@
 import { ProjectForm } from "@/modules/home/components/ui/ProjectForm"
 import Image from "next/image";
-import ProjectList from "@/modules/home/components/ui/ProjectList";
 
 const HomePage = () => {
   return (
     <div className="flex flex-col max-w-5xl mx-auto w-full">
-      <section className="space-y-6 py-[16vh] 2xl:py-48">
+      <section className="space-y-6 py-12 md:py-24">
         <div className="flex flex-col items-center">
           <Image src="/logo.png" alt="Homos.ai Logo" width={50} height={50} className="hidden md:block" />
         </div>
@@ -15,7 +14,7 @@ const HomePage = () => {
           <ProjectForm />
         </div>
       </section>
-      <ProjectList />
+      {/* Projects moved to sidebar */}
     </div>
   )
 }
