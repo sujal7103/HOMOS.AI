@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/animated-sidebar";
+import { Sidebar, SidebarBody } from "@/components/ui/animated-sidebar";
 import {
   IconPlus,
   IconSearch,
@@ -22,11 +22,10 @@ import { formatDistanceToNow } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface HomosSidebarProps {
-  children?: React.ReactNode;
   className?: string;
 }
 
-export function HomosSidebar({ children, className }: HomosSidebarProps) {
+export function HomosSidebar({ className }: HomosSidebarProps) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { signOut } = useClerk();
@@ -45,9 +44,6 @@ export function HomosSidebar({ children, className }: HomosSidebarProps) {
   // Calculate remaining credits
   const remainingCredits = usageStatus 
     ? usageStatus.remainingPoints 
-    : null;
-  const totalCredits = usageStatus 
-    ? usageStatus.remainingPoints + usageStatus.consumedPoints 
     : null;
 
   // Filter projects based on search
