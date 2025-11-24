@@ -99,8 +99,11 @@ export const codeAgent = inngest.createFunction(
 		}
 
 		// Detect if it's an OpenRouter key and configure accordingly
-		const apiKey = process.env.OPENAI_API_KEY;
+		const apiKey = process.env.OPENAI_API_KEY.trim();
 		const isOpenRouter = apiKey.startsWith("sk-or-");
+		
+		console.log("API Key detected:", isOpenRouter ? "OpenRouter" : "OpenAI");
+		console.log("Using baseURL:", isOpenRouter ? "https://openrouter.ai/api/v1" : "default");
 		
 		const model = openai({
 			model: isOpenRouter ? "openai/gpt-4o-mini" : "gpt-4o-mini",
@@ -236,7 +239,7 @@ export const codeAgent = inngest.createFunction(
 				system: FRAGMENT_TITLE_PROMPT,
 				model: openai({
 					model: isOpenRouter ? "openai/gpt-4o-mini" : "gpt-4o-mini",
-					apiKey: apiKey,
+					apiKey: apiKey.trim(),
 					...(isOpenRouter && {
 						baseURL: "https://openrouter.ai/api/v1"
 					})
@@ -248,7 +251,7 @@ export const codeAgent = inngest.createFunction(
 				system: RESPONSE_PROMPT,
 				model: openai({
 					model: isOpenRouter ? "openai/gpt-4o-mini" : "gpt-4o-mini",
-					apiKey: apiKey,
+					apiKey: apiKey.trim(),
 					...(isOpenRouter && {
 						baseURL: "https://openrouter.ai/api/v1"
 					})
