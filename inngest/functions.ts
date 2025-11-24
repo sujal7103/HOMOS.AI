@@ -98,9 +98,16 @@ export const codeAgent = inngest.createFunction(
 			throw new Error("OPENAI_API_KEY is not set in environment variables. Please add it to your .env file.");
 		}
 
+		// Detect if it's an OpenRouter key and configure accordingly
+		const apiKey = process.env.OPENAI_API_KEY;
+		const isOpenRouter = apiKey.startsWith("sk-or-");
+		
 		const model = openai({
-			model: "gpt-4o-mini",
-			apiKey: process.env.OPENAI_API_KEY!,
+			model: isOpenRouter ? "openai/gpt-4o-mini" : "gpt-4o-mini",
+			apiKey: apiKey,
+			...(isOpenRouter && {
+				baseURL: "https://openrouter.ai/api/v1"
+			})
 		});			const codeAgent = createAgent<AgentState>({
 				name: "code-agent",
 				system: PROMPT,
@@ -228,8 +235,11 @@ export const codeAgent = inngest.createFunction(
 				name: "fragment-title",
 				system: FRAGMENT_TITLE_PROMPT,
 				model: openai({
-					model: "gpt-4o-mini",
-					apiKey: process.env.OPENAI_API_KEY!,
+					model: isOpenRouter ? "openai/gpt-4o-mini" : "gpt-4o-mini",
+					apiKey: apiKey,
+					...(isOpenRouter && {
+						baseURL: "https://openrouter.ai/api/v1"
+					})
 				}),
 			});
 
@@ -237,8 +247,11 @@ export const codeAgent = inngest.createFunction(
 				name: "response-generator",
 				system: RESPONSE_PROMPT,
 				model: openai({
-					model: "gpt-4o-mini",
-					apiKey: process.env.OPENAI_API_KEY!,
+					model: isOpenRouter ? "openai/gpt-4o-mini" : "gpt-4o-mini",
+					apiKey: apiKey,
+					...(isOpenRouter && {
+						baseURL: "https://openrouter.ai/api/v1"
+					})
 				}),
 			});
 
