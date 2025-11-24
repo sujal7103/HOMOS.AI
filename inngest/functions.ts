@@ -13,6 +13,7 @@ import { FRAGMENT_TITLE_PROMPT, PROMPT, RESPONSE_PROMPT } from "@/prompt";
 import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { SANDBOX_TIMEOUT } from "./types";
+import { OpenAI } from "openai";
 
 interface AgentState {
 	summary: string;
@@ -105,12 +106,18 @@ export const codeAgent = inngest.createFunction(
 		console.log("API Key detected:", isOpenRouter ? "OpenRouter" : "OpenAI");
 		console.log("Using baseURL:", isOpenRouter ? "https://openrouter.ai/api/v1" : "default");
 		
+		// Create custom OpenAI client for OpenRouter
+		const openaiClient = isOpenRouter 
+			? new OpenAI({
+					apiKey: apiKey,
+					baseURL: "https://openrouter.ai/api/v1",
+			  })
+			: undefined;
+		
 		const model = openai({
 			model: isOpenRouter ? "openai/gpt-4o-mini" : "gpt-4o-mini",
 			apiKey: apiKey,
-			...(isOpenRouter && {
-				baseURL: "https://openrouter.ai/api/v1"
-			})
+			...(openaiClient && { client: openaiClient })
 		});			const codeAgent = createAgent<AgentState>({
 				name: "code-agent",
 				system: PROMPT,
@@ -240,9 +247,7 @@ export const codeAgent = inngest.createFunction(
 				model: openai({
 					model: isOpenRouter ? "openai/gpt-4o-mini" : "gpt-4o-mini",
 					apiKey: apiKey.trim(),
-					...(isOpenRouter && {
-						baseURL: "https://openrouter.ai/api/v1"
-					})
+					...(openaiClient && { client: openaiClient })
 				}),
 			});
 
@@ -252,9 +257,7 @@ export const codeAgent = inngest.createFunction(
 				model: openai({
 					model: isOpenRouter ? "openai/gpt-4o-mini" : "gpt-4o-mini",
 					apiKey: apiKey.trim(),
-					...(isOpenRouter && {
-						baseURL: "https://openrouter.ai/api/v1"
-					})
+					...(openaiClient && { client: openaiClient })
 				}),
 			});
 
