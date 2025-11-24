@@ -16,7 +16,7 @@
     "@clerk/themes": "^2.2.55",
     "@e2b/code-interpreter": "^1.5.1",
     "@hookform/resolvers": "^3.10.0",
-    "@inngest/agent-kit": "^0.9.0",
+    "@inngest/agent-kit": "^0.13.2",
     "@prisma/client": "^6.11.1",
     "@prisma/extension-accelerate": "^2.0.2",
     "@radix-ui/react-accordion": "^1.2.11",
@@ -58,7 +58,7 @@
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.24",
-    "inngest": "^3.40.1",
+    "inngest": "^3.46.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.525.0",
     "next": "15.3.5",
@@ -79,7 +79,7 @@
     "superjson": "^2.2.2",
     "tailwind-merge": "^3.3.1",
     "vaul": "^1.1.2",
-    "zod": "^3.24.1"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
